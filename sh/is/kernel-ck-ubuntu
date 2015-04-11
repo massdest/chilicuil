@@ -6,13 +6,13 @@
 
 #####################################
 #kernel version base
-kernel="3.15"
+kernel="3.19"
 #kernel specific version
-patchkernel="3.15.5"
+patchkernel="3.19.3"
 #BFQ patch
-bfq="3.15.0-v7r5"
+bfq="3.19.0-v7r7"
 #CK patch
-patchck="3.15-ck1"
+patchck="3.19-ck1"
 #####################################
 
 ################################################################################
@@ -22,10 +22,10 @@ patchck="3.15-ck1"
 trap _cleanup SIGINT SIGTERM #trap ctrl-c
 
 #/tmp partition could have noexec
-tmp_path="${HOME}/.tmp/kernel-ck-ubuntu-${patchkernel}"
+#tmp_path="${HOME}/.tmp/kernel-ck-ubuntu-${patchkernel}"
+tmp_path="/home/andry/700/andry/folders/compile/kernel-ck-ubuntu-${patchkernel}"
 curr_path="${PWD}"
-apps_default="kernel-package gcc-4.6 libncurses5 libncurses5-dev build-essential
-patch fakeroot bc"
+apps_default="kernel-package gcc-4.6 libncurses5 libncurses5-dev build-essential patch fakeroot bc xz-utils"
 
 cl="$(printf "%s\\n" "$(($(grep -c processor /proc/cpuinfo) + 1))")"
 vbfq="$(printf "%s" "${bfq}" | cut -d'-' -f2)"
@@ -34,23 +34,23 @@ arqt="$(dpkg --print-architecture)"
 
 _printfl()
 {   #print lines
-    _printfl__max_len="80"
+    _printfl_var_max_len="80"
     if [ -n "${1}" ]; then
-        _printfl__word_len="$((${#1} + 2))"
-        _printfl__sub="$((${_printfl__max_len} - ${_printfl__word_len}))"
-        _printfl__half="$((${_printfl__sub} / 2))"
-        _printfl__other_half="$((${_printfl__sub} - ${_printfl__half}))"
+        _printfl_var_word_len="$((${#1} + 2))"
+        _printfl_var_sub="$((${_printfl_var_max_len} - ${_printfl_var_word_len}))"
+        _printfl_var_half="$((${_printfl_var_sub} / 2))"
+        _printfl_var_other_half="$((${_printfl_var_sub} - ${_printfl_var_half}))"
         printf "%b" "\033[1m" #white strong
-        printf '%*s' "${_printfl__half}" '' | tr ' ' -
+        printf '%*s' "${_printfl_var_half}" '' | tr ' ' -
         printf "%b" "\033[7m" #white background
         printf " %s " "${1}"
         printf "%b" "\033[0m\033[1m" #white strong
-        printf '%*s' "${_printfl__other_half}" '' | tr ' ' -
+        printf '%*s' "${_printfl_var_other_half}" '' | tr ' ' -
         printf "%b" "\033[0m" #back to normal
         printf "\\n"
     else
         printf "%b" "\033[1m" #white strong
-        printf '%*s' "${_printfl__max_len}" '' | tr ' ' -
+        printf '%*s' "${_printfl_var_max_len}" '' | tr ' ' -
         printf "%b" "\033[0m" #back to normal
         printf "\\n"
     fi
@@ -123,7 +123,7 @@ _animcui()
         return 1;
     fi
 
-    _animcui__animation_state="1"
+    _animcui_var_animation_state="1"
 
     if [ ! "$(ps -p "$(pidof "${1}")" -o comm= 2>/dev/null)" ]; then
         printf "%5s\n" ""
@@ -134,15 +134,15 @@ _animcui()
 
     while [ "$(ps -p "$(pidof "${1}")" -o comm= 2>/dev/null)" ]; do
         printf "%b" "\b\b\b\b\b"
-        case "${_animcui__animation_state}" in
+        case "${_animcui_var_animation_state}" in
             1) printf "%s" '\o@o\'
-               _animcui__animation_state="2" ;;
+               _animcui_var_animation_state="2" ;;
             2) printf "%s" '|o@o|'
-               _animcui__animation_state="3" ;;
+               _animcui_var_animation_state="3" ;;
             3) printf "%s" '/o@o/'
-               _animcui__animation_state="4" ;;
+               _animcui_var_animation_state="4" ;;
             4) printf "%s" '|o@o|'
-               _animcui__animation_state="1" ;;
+               _animcui_var_animation_state="1" ;;
         esac
         sleep 1
     done
@@ -160,18 +160,18 @@ _getroot()
 
             if [ -n "${sudopwd}" ]; then
                 # password check
-                _getroot__test="$(printf "%s\\n" "${sudopwd}" | sudo -S ls 2>&1)"
-                _getroot__status="${?}"
-                _getroot__not_allowed="$(printf "%s" "${_getroot__test}" | \
+                _getroot_var_test="$(printf "%s\\n" "${sudopwd}" | sudo -S ls 2>&1)"
+                _getroot_var_status="${?}"
+                _getroot_var_not_allowed="$(printf "%s" "${_getroot_var_test}" | \
                                          grep -i "sudoers")"
 
-                if [ -n "${_getroot__not_allowed}" ]; then
+                if [ -n "${_getroot_var_not_allowed}" ]; then
                     printf "%s %s\\n" "You're not allowed to use sudo," \
                     "get in contact with your local administrator"
                     exit
                 fi
 
-                if [ X"${_getroot__status}" != X"0" ]; then
+                if [ X"${_getroot_var_status}" != X"0" ]; then
                     sudopwd=""
                     printf "%s\\n" "Incorrect preseed password"
                     exit
@@ -190,19 +190,19 @@ _getroot()
                 stty echo
 
                 # password check
-                _getroot__test="$(printf "%s\\n" "${sudopwd}" | sudo -S ls 2>&1)"
-                _getroot__status="${?}"
-                _getroot__not_allowed="$(printf "%s" "${_getroot__test}" | \
+                _getroot_var_test="$(printf "%s\\n" "${sudopwd}" | sudo -S ls 2>&1)"
+                _getroot_var_status="${?}"
+                _getroot_var_not_allowed="$(printf "%s" "${_getroot_var_test}" | \
                                          grep -i "sudoers")"
 
-                if [ -n "${_getroot__not_allowed}" ]; then
+                if [ -n "${_getroot_var_not_allowed}" ]; then
                     printf "\\n%s %s\\n" "You're not allowed to use sudo," \
                     "get in contact with your local administrator"
                     exit
                 fi
 
                 printf "\\n"
-                if [ X"${_getroot__status}" != X"0" ]; then
+                if [ X"${_getroot_var_status}" != X"0" ]; then
                     sudopwd=""
                 else
                     sudocmd="sudo -S"
@@ -283,8 +283,8 @@ _waitfor wget --no-check-certificate -N http://www.kernel.org/pub/linux/kernel/v
 [ ! -f patch-"${patchkernel}".gz ] && _die "couldn't get http://www.kernel.org/pub/linux/kernel/v3.x/patch-${patchkernel}.gz"
 
 _printfs "downloading -ck patches ..."
-_waitfor wget -N "http://ck.kolivas.org/patches/3.0/${kernel}/${patchck}/patch-${patchck}.bz2"
-[ ! -f patch-"${patchck}".bz2 ] && _die "couldn't get http://ck.kolivas.org/patches/3.0/${kernel}/${patchck}/patch-${patchck}.bz2"
+_waitfor wget -N "http://ck.kolivas.org/patches/3.0/${kernel}/${patchck}/patch-${patchck}.xz"
+[ ! -f patch-"${patchck}".xz ] && _die "couldn't get http://ck.kolivas.org/patches/3.0/${kernel}/${patchck}/patch-${patchck}.xz"
 
 _printfs "downloading bfq patches ..."
 _waitfor wget -N "http://algo.ing.unimo.it/people/paolo/disk_sched/patches/${bfq}/0001-block-cgroups-kconfig-build-bits-for-BFQ-${vbfq}-${kernel}.patch"
@@ -306,7 +306,7 @@ fi
 
 _printfs "uncompresing patches ..."
 _waitfor gunzip  patch-"${patchkernel}".gz; [ ! -f patch-"${patchkernel}" ] && _die "couldn't unpack patch-${patchkernel}.gz"
-_waitfor bunzip2 patch-"${patchck}".bz2;    [ ! -f patch-"${patchck}" ]     && _die "couldn't unpack patch-${patchck}.bz2"
+_waitfor unxz patch-"${patchck}".xz;    [ ! -f patch-"${patchck}" ]     && _die "couldn't unpack patch-${patchck}.xz"
 
 _printfs "moving to ${tmp_path}/linux-${patchkernel}-${ckk}"
 _waitfor rm -rf "linux-${patchkernel}-${ckk}"
@@ -322,12 +322,12 @@ _cmd     "patch -p1 < ../0003-block-bfq-add-Early-Queue-Merge-EQM-to-BFQ-${vbfq}
 
 _printfl "Configuring kernel"
 _printfs "downloading optimized config from http://repo-ck.com ...    "
-#_waitfor wget "http://liquorix.net/sources/${kernel}/config.${arqt}"
+_waitfor wget "http://liquorix.net/sources/${kernel}/config.${arqt}"
 ##TODO 05-11-2013 20:30 >> liquorix.net current configuration breaks -ck kernel
 #                          starting in >= 3.10, check from time to time if it can be reused
 
 #for now use config mirrored from http://repo-ck.com/
-_waitfor wget "http://javier.io/mirror/${kernel}/config.${arqt}"
+#_waitfor wget "http://javier.io/mirror/${kernel}/config.${arqt}"
 _cmd     cp -- "config.${arqt}" .config
 
 ##tmp fix for bug #663474, disable lguest hypervisor, http://lguest.ozlabs.org/lguest.txt
