@@ -8,7 +8,7 @@
 #kernel version base
 kernel="3.19"
 #kernel specific version
-patchkernel="3.19.3"
+patchkernel="3.19.8"
 #BFQ patch
 bfq="3.19.0-v7r7"
 #CK patch
@@ -491,7 +491,7 @@ sed -i -e 's/CONFIG_LOCALVERSION="-ck"/# CONFIG_LOCALVERSION="-ck"/' .config
 _printfl "Compiling kernel"
 _printfs "running make-kpkg ..."
 CONCURRENCY_LEVEL="${cl}"
-printf "\\n" | _cmd fakeroot make-kpkg --initrd kernel_image kernel_headers modules_image
+printf "\\n" | _cmd fakeroot make-kpkg --jobs ${cl} --initrd kernel_image kernel_headers modules_image
 
 _printfl "DONE"
 _printfs "copying debs files ..."
